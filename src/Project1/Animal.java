@@ -20,6 +20,10 @@ public abstract class Animal extends Thread {
     	
     }
     
+    protected int distance(Animal animal) {
+    	return (int) Math.sqrt(Math.pow((animal.getPosition().x - this.getPosition().x),2) + Math.pow((animal.getPosition().y - this.getPosition().y),2));
+    }
+    
 //    public final void bigFizzle(){
 //        for (Elephant elephant: field.elephants){
 //            boolean interrupted = true;

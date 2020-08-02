@@ -16,7 +16,7 @@ public class World {
     protected final HashSet<Point> occupied = new HashSet<>();
     protected final int strikingDistance;
     
-    public World(int xs, int ys, int strikingDistance, int nummice, int numelephants){
+    public World(int xs, int ys, int strikingDistance, int numelephants, int nummice){
         this.xsize = xs;
         this.ysize = ys;
     	this.strikingDistance = strikingDistance;
@@ -50,61 +50,10 @@ public class World {
     	return occupied.contains(pos);
     }
     
-//    public final void letThereBeLight(){
-//        for(Elephant el: elephants)
-//            el.start();
-//        for(Mouse m: mice)
-//            m.start();
-//    }
     
     public Point randomPosition(){
         return new Point (ThreadLocalRandom.current(). nextInt(xsize), ThreadLocalRandom.current().nextInt(ysize));
     }
-    
-//    public synchronized void reaper() {
-//    	reaperHelper(mice);
-//    	reaperHelper(elephants);
-//    }
-//    
-//    public synchronized void reaperHelper(LinkedList animals){
-//        do{
-//            Iterator<Animal> iterator = animals.iterator();        
-//            while (iterator.hasNext()){
-//                Animal animal = iterator.next();
-//                if(!animal.isAlive());{
-//                    boolean joininterrupted = true;
-//                    while (joininterrupted)
-//                        try{
-//                            animal.join();
-//                            joininterrupted = false;
-//                        }
-//                        
-//                        catch(InterruptedException e){
-//                            
-//                        }
-//                    iterator.remove();
-//                }
-//            }
-//        
-//        
-//        
-//            if (!animals.isEmpty()){
-//                boolean interrupted = true;
-//                while(interrupted){
-//                    try{
-//                        wait();
-//                        interrupted = false;
-//                    }
-//
-//                    catch(InterruptedException e){
-//
-//                    }
-//                }
-//            }
-//        }
-//        while (!animals.isEmpty());
-//        
-//    }
 
 	public int mouseCount(Point point) {
 		return mice.size();

@@ -1,6 +1,7 @@
 package Project1;
 import java.awt.Point;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 public class Elephant extends Animal{
 	
@@ -20,7 +21,7 @@ public class Elephant extends Animal{
     	return mice.size();
     }
     
-    public void move(World field) {
+    public synchronized void move() {
     	super.move();
     	LinkedList<Mouse> strikingMice = new LinkedList<Mouse>();
     	for (Mouse mse : field.mice) {
@@ -32,37 +33,62 @@ public class Elephant extends Animal{
     			int newX = this.getRandom(new int[]{xplus, xminus});
     			int newY = this.getRandom(new int[]{yplus, yminus});
     			mse.setPosition(new Point(newX, newY));
-    		}else {
+    			System.out.println("test0");
+    		}else if (this.distance(mse) < field.strikingDistance ){
+    			System.out.println("test1");
     			strikingMice.add(mse);
     		}
     	}
     	if (strikingMice.size() > 0) {
-    		int startX = Math.max(0, this.getPosition().x - 1);
-    		int startY = Math.max(0, this.getPosition().y - 1);
-    		int endX = Math.max(field.xsize-1, this.getPosition().x + 1);
-    		int endY = Math.max(field.ysize-1, this.getPosition().y + 1);
+    		int startX = Math.max(1, this.getPosition().x - 1);
+    		int startY = Math.max(1, this.getPosition().y - 1);
+    		int endX = Math.min(field.xsize, this.getPosition().x + 1) - startX + 1;
+    		int endY = Math.min(field.ysize, this.getPosition().y + 1) - startY + 1;
     		
-    		LinkedList<Point> squares = new LinkedList<Point>();
-    		for (int i=startX; i<=endX; i++) {
-    			for (int j=startY; j<=endY; j++) {
-    				squares.add(new Point(i,j));
+    		System.out.println("test1.5");
+    		Point[][] squares = new Point[endX][endY];
+    		for (int i=0; i<endX; i++) {
+    			System.out.println("test2");
+    			for (int j=0; j<endY; j++) {
+    				System.out.println("test3");
+    				squares[i][j] = new Point(startX+i, startY+j);
     			}
     		}
     		for (Mouse mse : strikingMice) {
-    			for (int i = 0; i<squares.size(); i++) {
-    				if (mse.getPosition().equals(squares.get(i))){
-    					squares.remove(i);
+    			System.out.println("test4");
+    			for (int i = 0; i < endX; i++) {
+    				System.out.println(endX);
+    				for (int j = 0; i < endY; i++) {
+	    				System.out.println(endY);
+	    				try {
+		    				if (mse.getPosition().equals(squares[i][j])){
+		    					squares[i][j] = null;
+		    				}
+	    				}catch (Exception e) {
+	    					System.out.println(e);
+	    				}
     				}
     			}
     		}
+    		
+    		LinkedList<Point> availableSquares = new LinkedList<Point>();
+    		for (int i = 0; i<endX; i++) {
+				for (int j = 0; i<endY; i++) {
+					if (squares[i][j] != null){
+						availableSquares.add(squares[i][j]);
+					}
+				}
+    		}
             
-    		if (squares.size() > 0) {
-    			int newSquare = (int) Math.random() * squares.size();
-    			this.setPosition(squares.get(newSquare));
+    		if (availableSquares.size() > 0) {
+    			int newSquare = (int) Math.random() * availableSquares.size();
+    			this.setPosition(availableSquares.get(newSquare));
     		}
     	}else {
+    		System.out.println("test6");
     		super.move();
     	}
+    	
     }
     
 
@@ -75,15 +101,23 @@ public class Elephant extends Animal{
 
     
     public void run(){
-        while (numMiceOnSpace() <= 2){
-        	this.move();
-        }
-        for(int el=0; el<field.elephants.size(); el++) {
-        	field.elephants.remove(el);
-        	if (field.elephants.get(el).equals(this)){
-            	field.elephants.remove(el);
-        	}
-        }
-        this.currentThread().setPriority(this.currentThread().getPriority()-1);
+    	try {
+	        while (numMiceOnSpace() < 2){
+	        	this.move();
+	        	TimeUnit.MILLISECONDS.sleep(200);
+	        }
+	        for(int el=0; el<field.elephants.size(); el++) {
+	        	
+	        	if (field.elephants.get(el).equals(this)){
+	    	        System.out.println("Huzzah, an Elephant has been eaten!");
+	        		field.elephants.remove(el);
+	        	}
+	        }
+	        System.out.println(field.elephants.size());
+    	}catch(Exception e) {
+	        System.out.println("Elephant error");
+    		System.out.println(e);
+    		System.exit(0);
+    	}
     }
 }
